@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg-color: #050505;
+    --glass-bg: rgba(16, 18, 27, 0.7);
+    --neon-cyan: #00f3ff;
+    --neon-purple: #bc13fe;
+    --text-color: #e0eaff;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden; 
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+/* Chat Area - Fully Responsive Container */
+#chat-container {
+    width: 100%;
+    max-width: 800px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-left: 1px solid rgba(0, 243, 255, 0.2);
+    border-right: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+#chat-history {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-right: 10px;
+}
+
+/* Chat Bubbles */
+.message {
+    max-width: 80%;
+    padding: 12px 18px;
+    border-radius: 8px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    word-wrap: break-word; 
+}
+
+.message.user {
+    align-self: flex-end;
+    border-right: 3px solid var(--neon-cyan);
+}
+
+.message.ai {
+    align-self: flex-start;
+    border-left: 3px solid var(--neon-purple);
+}
+
+/* Input Area */
+#input-area {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+input {
+    flex-grow: 1;
+    min-width: 0; 
+    background: var(--glass-bg);
+    border: 1px solid var(--neon-cyan);
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    outline: none;
+}
+
+input:focus {
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+}
+
+button {
+    background: transparent;
+    border: 1px solid var(--neon-purple);
+    color: var(--neon-purple);
+    padding: 0 25px;
+    font-family: 'Orbitron', sans-serif;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+button:hover {
+    background: var(--neon-purple);
+    color: white;
+    box-shadow: 0 0 20px rgba(188, 19, 254, 0.6);
+}
+
+@media (max-width: 600px) {
+    #chat-container {
+        padding: 10px;
+        border: none;
+    }
+    .message {
+        max-width: 95%; 
+    }
+    #input-area {
+        flex-direction: column; 
+    }
+    button {
+        padding: 15px;
+        width: 100%;
+    }
+}

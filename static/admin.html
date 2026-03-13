@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SOC Security Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            background-color: #050505; 
+            color: #00f3ff; 
+            font-family: sans-serif; 
+            padding: 20px; 
+            overflow-x: hidden; 
+        }
+
+        h1 { margin-bottom: 20px; text-align: center; }
+
+        /* Top Stats Row */
+        .stats-row { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+            margin-bottom: 30px; 
+        }
+
+        .stat-box {
+            flex: 1 1 200px; 
+            background: rgba(16, 18, 27, 0.8);
+            border: 1px solid #00f3ff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .stat-box span { 
+            color: #bc13fe; 
+            font-weight: bold; 
+            font-size: 2.5rem; 
+            display: block; 
+            margin-top: 10px;
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .card { 
+            background: rgba(16, 18, 27, 0.8); 
+            padding: 20px; 
+            border: 1px solid #00f3ff; 
+            border-radius: 8px; 
+            width: 100%;
+            overflow: hidden; /* Keeps Chart.js contained */
+        }
+
+        h3 { margin-bottom: 15px; border-bottom: 1px solid rgba(0, 243, 255, 0.3); padding-bottom: 5px; }
+        
+        canvas { max-width: 100% !important; height: auto !important; }
+    </style>
+</head>
+<body>
+
+    <h1>🛡️ Security Operations Center (SOC)</h1>
+    
+    <div class="stats-row">
+        <div class="stat-box">Total Prompts <span id="val-total">0</span></div>
+        <div class="stat-box">Active Sessions <span id="val-sessions">0</span></div>
+        <div class="stat-box">Threats Blocked <span id="val-blocked">0</span></div>
+        <div class="stat-box">PII Redacted <span id="val-pii">0</span></div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Threat Breakdown</h3>
+            <canvas id="threatChart"></canvas>
+        </div>
+        <div class="card">
+            <h3>Live Threat Timeline</h3>
+            <canvas id="timelineChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Chart.js instances
+        const threatCtx = document.getElementById('threatChart').getContext('2d');
+        const threatChart = new Chart(threatCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Prompt Injection', 'Banned Words', 'Data Exfiltration'],
+                datasets: [{ data: [0, 0, 0], backgroundColor: ['#ff003c', '#bc13fe', '#00f3ff'] }]
+            },
+            options: { responsive: true, color: '#fff' }
+        });
+
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+        const timelineChart = new Chart(timelineCtx, {
+            type: 'line',
+            data: {
+                labels: [], // Timestamps go here
+                datasets: [{ label: 'Attacks Detected', data: [], borderColor: '#ff003c', tension: 0.4 }]
+            },
+            options: { responsive: true, color: '#fff', scales: { y: { beginAtZero: true } } }
+        });
+
+        // Poll the backend for live data
+        setInterval(async () => {
+            const res = await fetch('/api/admin/metrics');
+            const data = await res.json();
+
+            // Update Top Numbers
+            document.getElementById('val-total').innerText = data.metrics.total_messages;
+            document.getElementById('val-sessions').innerText = data.active_users;
+            document.getElementById('val-blocked').innerText = data.metrics.blocked_messages;
+            document.getElementById('val-pii').innerText = data.metrics.pii_redactions;
+
+            // Update Doughnut Chart
+            threatChart.data.datasets[0].data = [
+                data.metrics.blocks_by_reason["Prompt Injection"],
+                data.metrics.blocks_by_reason["Banned Words"],
+                data.metrics.blocks_by_reason["Data Exfiltration"]
+            ];
+            threatChart.update();
+
+            // Update Timeline Chart
+            timelineChart.data.labels = data.metrics.threat_timeline;
+            timelineChart.data.datasets[0].data = data.metrics.threat_timeline.map((_, i) => i + 1);
+            timelineChart.update();
+
+        }, 2000);
+    </script>
+</body>
+</html>
