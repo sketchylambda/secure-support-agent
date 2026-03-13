@@ -78,12 +78,21 @@ Create a `.env` file in the root directory and add your API credentials:
 GEMINI_API_KEY=your_google_api_key_here
 ```
 
-### 4. Running the Application
-Ensure `data/ecommerce.db` SQLite database is populated, then launch the Chainlit server:
+### 4. Database Initialization
+Generate the local SQLite database from the seed data:
 ```bash
-chainlit run app.py -w
+python scripts/setup_database.py
 ```
-Navigate to `http://localhost:8000` in your browser to interact with the agent.
+
+### 5. Running the Application
+Ensure `data/ecommerce.db` SQLite database is populated, then launch the FastAPI server:
+```bash
+python server.py
+```
+
+### 6. Access the Interfaces
+*Customer Chat UI: Open your browser and navigate to `http://localhost:8000`
+*SOC Admin Dashboard: Open a second tab and navigate to `http://localhost:8000/admin`
 
 ---
 
